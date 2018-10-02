@@ -23,8 +23,8 @@ public class PrizmPMCChecker {
     }
 
     private void setPropertyFile() throws IOException {
-        prizmModellChecker.setPropertyFileHigh(" P > "+keyProperty.toString()+"[ F = "+parametricMarkovChain.targetLocation.toString()+"]");
-        prizmModellChecker.setPropertyFileLow(" P < "+keyProperty.toString()+"[ F = "+parametricMarkovChain.targetLocation.toString()+"]");
+        prizmModellChecker.setPropertyFileHigh(" P > "+keyProperty.toString()+"[ F l = "+parametricMarkovChain.targetLocation.toString()+"]");
+        prizmModellChecker.setPropertyFileLow(" P < "+keyProperty.toString()+"[ F l = "+parametricMarkovChain.targetLocation.toString()+"]");
     }
 
     //relaxation
@@ -36,11 +36,11 @@ public class PrizmPMCChecker {
 
         for(Integer sourceLocation=0; sourceLocation<parametricMarkovChain.locationNumber; sourceLocation++){
             double [] [] actions=parametricMarkovChain.locations[sourceLocation].generateAndGetActions();
-            for(Integer action=0;action<parametricMarkovChain.actionNumber;action++){
-                prizmModell.append("[] s= "+sourceLocation.toString()+" -> ");
+            for(Integer action=0;action<parametricMarkovChain.locations[sourceLocation].actionNumber;action++){
+                prizmModell.append("[] l= "+sourceLocation.toString()+" -> ");
                 for (Integer targetLocation=0; targetLocation<parametricMarkovChain.locationNumber; targetLocation++){
                     if(actions[targetLocation][action]!=0){
-                        prizmModell.append(Double.toString(actions[targetLocation][action])+"(s'="+targetLocation.toString()+") + ");
+                        prizmModell.append(Double.toString(actions[targetLocation][action])+" : (l'="+targetLocation.toString()+") + ");
                     }
                 }
                 prizmModell.append(" 0:(l'=0);\n");

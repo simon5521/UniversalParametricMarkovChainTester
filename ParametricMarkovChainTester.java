@@ -8,9 +8,9 @@ import java.util.Queue;
 
 public class ParametricMarkovChainTester {
 
-    public final String outputLocation="/output.txt";
+    public final String outputLocation="c:\\Users\\simon5521\\Desktop\\output4.txt";
     private final double keyProbability;
-    private int iteratonLimit=10;
+    private final int iteratonLimit=10;
     private Queue<ParametricMarkovChain> fifo;
     private PrintWriter printWriter;
     private PrizmPMCChecker prizmPMCChecker;
@@ -47,8 +47,10 @@ public class ParametricMarkovChainTester {
         Integer counter=0;
         while (!fifo.isEmpty()){
             counter++;
-            testTopParametricMarkovChain();
             System.out.println("Testing and cutting; iteration:"+counter.toString());
+            System.out.print("Size of fifo ");
+            System.out.println(fifo.size());
+            testTopParametricMarkovChain();
         }
     }
 
@@ -58,22 +60,26 @@ public class ParametricMarkovChainTester {
 
         if(prizmPMCChecker.checkHigh()){
             //write out the interval
-            printWriter.print("upper area: "+parametricMarkovChain.getParameterSpace().toString());
-            System.out.println("upper area found");
+            String outputString="upper area: "+parametricMarkovChain.getParameterSpace().toString();
+            printWriter.print(outputString);
+            System.out.println(outputString);
 
         } else if(prizmPMCChecker.checkLow()){
             //write out the interval
-            printWriter.print("downer area: "+parametricMarkovChain.getParameterSpace().toString());
-            System.out.println("downer area found");
+            String outputString="downer area: "+parametricMarkovChain.getParameterSpace().toString();
+            printWriter.println(outputString);
+            System.out.println(outputString);
 
         } else {
             Parameter cutParameter=searchCutParameter(parametricMarkovChain.getParameterSpace());
             ParametricMarkovChain parametricMarkovChainLow=parametricMarkovChain.copy();
             parametricMarkovChainLow.setParameterSpace(parametricMarkovChain.getParameterSpace().cutSpaceByParameterAndGetLow(cutParameter.name));
             ParametricMarkovChain parametricMarkovChainHigh=parametricMarkovChain.copy();
-            parametricMarkovChainHigh.setParameterSpace(parametricMarkovChain.getParameterSpace().cutSpaceByParameterAndGetLow(cutParameter.name));
-            fifo.add(parametricMarkovChainLow);
-            fifo.add(parametricMarkovChainHigh);
+            parametricMarkovChainHigh.setParameterSpace(parametricMarkovChain.getParameterSpace().cutSpaceByParameterAndGetUp(cutParameter.name));
+            if(cutParameter.cutted<=iteratonLimit){
+                fifo.add(parametricMarkovChainLow);
+                fifo.add(parametricMarkovChainHigh);
+            }
         }
 
     }

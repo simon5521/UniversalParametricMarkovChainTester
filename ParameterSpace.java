@@ -43,10 +43,24 @@ public class ParameterSpace {
 
     public ParameterSpace(Scanner inputStream){
         ParameterSpace parameterSpace=new ParameterSpace();
+        //for(int i=0;i<3;i++){
         while (inputStream.hasNext(Parameter.note)){
             Parameter parameter=new Parameter(inputStream);
             this.map.put(parameter.name,parameter);
         }
+    }
+
+    public String toString(){
+        StringBuilder stringBuilder=new StringBuilder("Parameterspace: \n");
+        for (Map.Entry<String,Parameter> entry:map.entrySet()){
+            stringBuilder.append(entry.getValue().name);
+            stringBuilder.append(" : ");
+            stringBuilder.append(entry.getValue().lowerLimit);
+            stringBuilder.append("; ");
+            stringBuilder.append(entry.getValue().upperLimit);
+            stringBuilder.append("\n");
+        }
+        return stringBuilder.toString();
     }
 
 }

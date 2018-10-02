@@ -35,7 +35,12 @@ public class ParametricMarkovChain {
         locations=new Location[locationNumber];
         targetLocation=inputStream.nextInt();
         parameterSpace=new ParameterSpace(inputStream);
-        for (int locationCounter=0;inputStream.hasNext(Location.note) || locationCounter<locationNumber;){
+        for (
+                int locationCounter=0;
+                inputStream.hasNext(Location.note) &&
+                locationCounter<locationNumber;
+                locationCounter++
+                ){
             locations[locationCounter]=new Location(parameterSpace,locationNumber,inputStream);
         }
         calculateActionNumber();
@@ -52,6 +57,10 @@ public class ParametricMarkovChain {
 
         this.parameterSpace = parameterSpace;
 
+        for(Location location:locations){
+            location.setParameterSpace(parameterSpace);
+        }
+
     }
 
     public ParameterSpace getParameterSpace(){
@@ -61,8 +70,10 @@ public class ParametricMarkovChain {
     public void calculateActionNumber(){
         int maxActionNumber=0;
         for (int i=0;i<locationNumber;i++){
-            if(locations[i].actionNumber>maxActionNumber){
-                maxActionNumber=locations[i].actionNumber;
+            if(locations[i]!=null){
+                if(locations[i].actionNumber>maxActionNumber){
+                    maxActionNumber=locations[i].actionNumber;
+                }
             }
         }
         actionNumber=maxActionNumber;

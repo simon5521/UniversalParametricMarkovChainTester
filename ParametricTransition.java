@@ -21,7 +21,7 @@ public class ParametricTransition {
     public ParametricTransition(ParameterSpace parameterSpace,Scanner inputStream){
         this.parameterSpace = parameterSpace;
         localParameters=new HashSet<>();
-        this.valueExpression=inputStream.next("[a-zA-Z0-9]+");
+        this.valueExpression=inputStream.next("[\\p{Graph}]+");
         searchParameters();
     }
 
@@ -40,7 +40,7 @@ public class ParametricTransition {
 
     private double getLocalValue(StringBuilder localValue){
         double value;
-        if ('9'>localValue.charAt(0) && '0'<localValue.charAt(0)){
+        if (('9'>localValue.charAt(0) && '0'<localValue.charAt(0)) || localValue.charAt(0)=='-'){
             value=Double.parseDouble(localValue.toString());
         }else {
             value=parameterSpace.map.get(localValue.toString()).getValue();
@@ -52,7 +52,7 @@ public class ParametricTransition {
     public double getRate(){
         char [] c_valueExpression=valueExpression.toCharArray();
         StringBuilder accumulator=new StringBuilder();
-        Double rate=null;
+        Double rate=0.0;
         Double multipleAccumulator=1.0;
         boolean state=true;
         for(int i=0; i<c_valueExpression.length;i++){

@@ -1,11 +1,10 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 public class Location {
 
-    private Set<Parameter> localParameters;
+    private Set<Parameter> localParameters=new HashSet<Parameter>();
+
+    private ParameterSpace parameterSpace;
 
     private ParametricTransition [] transitions;
 //--------------------------------------------
@@ -17,7 +16,7 @@ public class Location {
 
     public int parameterNumber;
 
-    public static final String note="$";
+    public static final String note="Location";
 
 //do not use
     public Location(int locationNumber){
@@ -32,8 +31,10 @@ public class Location {
 
 
     public Location(ParameterSpace parameterSpace, int locationNumber, Scanner inputStream){
+        this.parameterSpace = parameterSpace;
         this.locationNumber=locationNumber;
         transitions=new ParametricTransition[locationNumber];
+        inputStream.next(Location.note);
         while (inputStream.hasNextInt()){
             int targetLocattion=inputStream.nextInt();
             transitions[targetLocattion]=new ParametricTransition(parameterSpace,inputStream);
@@ -45,9 +46,24 @@ public class Location {
 
     }
 
+    public void setParameterSpace(ParameterSpace parameterSpace){
+
+        this.parameterSpace = parameterSpace;
+
+        for(ParametricTransition parametricTransition:transitions){
+            if(parametricTransition!=null) {
+                parametricTransition.setParameterSpace(parameterSpace);
+            }
+        }
+
+    }
+
     private void collectLocalParameters(){
-        for(ParametricTransition transition:transitions){
-            localParameters.addAll(transition.localParameters);
+        for(ParametricTransition transition:transitions) {
+            if (transition != null) {
+                localParameters.addAll(transition.localParameters);
+
+            }
         }
     }
 
@@ -82,7 +98,9 @@ public class Location {
                 }
             }
             for (int j=0;j<locationNumber;j++){
-                actions[j][i]=transitions[j].getRate();
+                if(transitions[j]!=null){
+                    actions[j][i]=transitions[j].getRate();
+                }
             }
         }
         return actions;
