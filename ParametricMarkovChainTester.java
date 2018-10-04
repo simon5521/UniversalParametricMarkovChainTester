@@ -1,7 +1,7 @@
-import java.io.FileNotFoundException;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -11,21 +11,26 @@ public class ParametricMarkovChainTester {
     public final String outputLocation="c:\\Users\\simon5521\\Desktop\\output4.txt";
     private final double keyProbability;
     private final int iteratonLimit=10;
-    private Queue<ParametricMarkovChain> fifo;
-    private PrintWriter printWriter;
+    private Queue<ParameterSpace> fifo;
+    private ParametricMarkovChain parametricMarkovChain;
     private PrizmPMCChecker prizmPMCChecker;
+    BufferedWriter fileWriter=new BufferedWriter(new FileWriter(outputLocation));
+    private final double JordanMeasure;
+    private double actualJordanMeasure=0.0;
+
 
     public ParametricMarkovChainTester(
             double keyProbability,
             ParametricMarkovChain parametricMarkovChain
     ) throws IOException {
         this.keyProbability=keyProbability;
-        fifo=new LinkedList<ParametricMarkovChain>();
-        fifo.add(parametricMarkovChain);
+        this.parametricMarkovChain=parametricMarkovChain;
+        fifo=new LinkedList<ParameterSpace>();
+        fifo.add(parametricMarkovChain.getParameterSpace());
 
         prizmPMCChecker=new PrizmPMCChecker(parametricMarkovChain,keyProbability);
+        JordanMeasure=parametricMarkovChain.getParameterSpace().getJordanMeasure();
 
-        printWriter=new PrintWriter(outputLocation,"UTF-8");
     }
 
 
@@ -48,40 +53,45 @@ public class ParametricMarkovChainTester {
         while (!fifo.isEmpty()){
             counter++;
             System.out.println("Testing and cutting; iteration:"+counter.toString());
+            System.out.println("Jordan Measure rate:"+Double.toString(actualJordanMeasure/JordanMeasure));
             System.out.print("Size of fifo ");
             System.out.println(fifo.size());
-            testTopParametricMarkovChain();
+            testTopParameterSpace();
         }
+        fileWriter.close();
     }
 
-    private void testTopParametricMarkovChain() throws Exception {
+    private void testTopParameterSpace() throws Exception {
 
-        ParametricMarkovChain parametricMarkovChain=fifo.remove();
+        ParameterSpace parameterSpace=fifo.remove();
+        System.out.println(parameterSpace.toString());
+        parametricMarkovChain.setParameterSpace(parameterSpace);
+        prizmPMCChecker.setParametricMarkovChain(parametricMarkovChain);
 
-        if(prizmPMCChecker.checkHigh()){
+
+        if(keyProbability>=prizmPMCChecker.calculateMaxProbability()){
             //write out the interval
-            String outputString="upper area: "+parametricMarkovChain.getParameterSpace().toString();
-            printWriter.print(outputString);
+            String outputString="lower area: "+parametricMarkovChain.getParameterSpace().toString();
+            actualJordanMeasure+=parameterSpace.getJordanMeasure();
+            fileWriter.write(outputString+"\n");
             System.out.println(outputString);
 
-        } else if(prizmPMCChecker.checkLow()){
+        } else if(keyProbability<=prizmPMCChecker.calculateMinProbability()){
             //write out the interval
-            String outputString="downer area: "+parametricMarkovChain.getParameterSpace().toString();
-            printWriter.println(outputString);
+            String outputString="upper area: "+parametricMarkovChain.getParameterSpace().toString();
+            actualJordanMeasure+=parameterSpace.getJordanMeasure();
+            fileWriter.write(outputString+"\n");
             System.out.println(outputString);
 
         } else {
             Parameter cutParameter=searchCutParameter(parametricMarkovChain.getParameterSpace());
-            ParametricMarkovChain parametricMarkovChainLow=parametricMarkovChain.copy();
-            parametricMarkovChainLow.setParameterSpace(parametricMarkovChain.getParameterSpace().cutSpaceByParameterAndGetLow(cutParameter.name));
-            ParametricMarkovChain parametricMarkovChainHigh=parametricMarkovChain.copy();
-            parametricMarkovChainHigh.setParameterSpace(parametricMarkovChain.getParameterSpace().cutSpaceByParameterAndGetUp(cutParameter.name));
-            if(cutParameter.cutted<=iteratonLimit){
-                fifo.add(parametricMarkovChainLow);
-                fifo.add(parametricMarkovChainHigh);
+            if(cutParameter.cutted<iteratonLimit){
+                fifo.add(parametricMarkovChain.getParameterSpace().cutSpaceByParameterAndGetLow(cutParameter.name));
+                fifo.add(parametricMarkovChain.getParameterSpace().cutSpaceByParameterAndGetUp(cutParameter.name));
             }
         }
 
     }
+
 
 }

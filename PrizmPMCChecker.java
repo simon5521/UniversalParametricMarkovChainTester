@@ -16,6 +16,10 @@ public class PrizmPMCChecker {
         setKeyProperty(keyProperty);
     }
 
+    public void setParametricMarkovChain(ParametricMarkovChain parametricMarkovChain) {
+        this.parametricMarkovChain = parametricMarkovChain;
+    }
+
     public void setKeyProperty(Double keyProperty) throws IOException {
         if(keyProperty<=1.0 && keyProperty>=0.0)
             this.keyProperty = keyProperty;
@@ -23,8 +27,8 @@ public class PrizmPMCChecker {
     }
 
     private void setPropertyFile() throws IOException {
-        prizmModellChecker.setPropertyFileHigh(" P > "+keyProperty.toString()+"[ F l = "+parametricMarkovChain.targetLocation.toString()+"]");
-        prizmModellChecker.setPropertyFileLow(" P < "+keyProperty.toString()+"[ F l = "+parametricMarkovChain.targetLocation.toString()+"]");
+        prizmModellChecker.setPropertyFileHigh(" Pmax=? [ F l = "+parametricMarkovChain.targetLocation.toString()+" ] ");
+        prizmModellChecker.setPropertyFileLow(" Pmin=? [ F l = "+parametricMarkovChain.targetLocation.toString()+" ] ");
     }
 
     //relaxation
@@ -55,7 +59,15 @@ public class PrizmPMCChecker {
     }
 
     public boolean checkLow() throws Exception {
-        return prizmModellChecker.checkModellHigh(generatePrizmModell());
+        return prizmModellChecker.checkModellLow(generatePrizmModell());
+    }
+
+    public double calculateMinProbability() throws IOException {
+        return prizmModellChecker.calculateMinProbability(generatePrizmModell());
+    }
+
+    public double calculateMaxProbability() throws IOException {
+        return prizmModellChecker.calculateMaxProbability(generatePrizmModell());
     }
 
 }

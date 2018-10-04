@@ -15,9 +15,6 @@ public class Main {
     public static void main(String Args[]) throws Exception {
 
 
-
-
-
         String input="c:\\Users\\simon5521\\Desktop\\input.txt";
         File inputFile=new File(input);
         Scanner scanner=new Scanner(inputFile);

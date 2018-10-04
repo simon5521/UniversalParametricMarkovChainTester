@@ -29,6 +29,7 @@ public class ParametricMarkovChain {
         }
     }
 
+
     public ParametricMarkovChain(Scanner inputStream){
         startingLocation=inputStream.nextInt();
         locationNumber=inputStream.nextInt();

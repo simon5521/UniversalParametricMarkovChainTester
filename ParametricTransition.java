@@ -26,6 +26,7 @@ public class ParametricTransition {
     }
 
     private void searchParameters(){
+        localParameters.clear();
         for (Map.Entry<String,Parameter> entry:
          parameterSpace.map.entrySet()    ) {
             if(valueExpression.contains(entry.getKey())){
@@ -90,6 +91,7 @@ public class ParametricTransition {
     public void setParameterSpace(ParameterSpace parameterSpace){
 
         this.parameterSpace=parameterSpace;
+        searchParameters();
     }
 
 

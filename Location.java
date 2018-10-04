@@ -59,6 +59,7 @@ public class Location {
     }
 
     private void collectLocalParameters(){
+        localParameters.clear();
         for(ParametricTransition transition:transitions) {
             if (transition != null) {
                 localParameters.addAll(transition.localParameters);
@@ -68,6 +69,7 @@ public class Location {
     }
 
     public void generateActions(){
+        collectLocalParameters();
         Parameter  [] parameterArray = localParameters.toArray(new Parameter[localParameters.size()]);
         for(int i=0;i<actionNumber;i++){
             for (int j=0;j<parameterNumber;j++){ //beállítom az összes paramétert az alsó vagy felső határára
@@ -86,20 +88,22 @@ public class Location {
     }
 
     public double[][] generateAndGetActions(){
+        collectLocalParameters();
         Parameter  [] parameterArray = localParameters.toArray(new Parameter[localParameters.size()]);
-        for(int i=0;i<actionNumber;i++){
-            for (int j=0;j<parameterNumber;j++){ //beállítom az összes paramétert az alsó vagy felső határára
-                int mask=1<<j;
-                boolean actualBit=(mask&i)==1;
+        for(int actionBits=0;actionBits<actionNumber;actionBits++){
+            for (int parameterCounter=0;parameterCounter<parameterNumber;parameterCounter++){ //beállítom az összes paramétert az alsó vagy felső határára
+                int mask=1<<parameterCounter;
+                int maskedBits=(mask&actionBits)>>parameterCounter;
+                boolean actualBit=maskedBits==1;
                 if(actualBit){
-                    parameterArray[j].limit=ParameterDirection.UP;
+                    parameterArray[parameterCounter].limit=ParameterDirection.UP;
                 }else {
-                    parameterArray[j].limit=ParameterDirection.LOW;
+                    parameterArray[parameterCounter].limit=ParameterDirection.LOW;
                 }
             }
-            for (int j=0;j<locationNumber;j++){
-                if(transitions[j]!=null){
-                    actions[j][i]=transitions[j].getRate();
+            for (int targetLocation=0;targetLocation<locationNumber;targetLocation++){
+                if(transitions[targetLocation]!=null){
+                    actions[targetLocation][actionBits]=transitions[targetLocation].getRate();
                 }
             }
         }

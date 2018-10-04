@@ -63,4 +63,16 @@ public class ParameterSpace {
         return stringBuilder.toString();
     }
 
+    public double getJordanMeasure(){
+        double measure=1;
+        if(map.isEmpty()){
+            measure=0;
+        }
+        for (Map.Entry<String,Parameter> entry:map.entrySet()){
+            measure*=entry.getValue().upperLimit-entry.getValue().lowerLimit;
+        }
+
+        return measure;
+    }
+
 }
